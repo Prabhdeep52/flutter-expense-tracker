@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Newtransaction extends StatelessWidget {
+class Newtransaction extends StatefulWidget {
   Newtransaction(
       void Function(String txtitle, double txamount) addingNewTransaction,
       {Key? key,
@@ -8,8 +8,29 @@ class Newtransaction extends StatelessWidget {
       : super(key: key);
 
   final Function addingtx;
+
+  @override
+  State<Newtransaction> createState() => _NewtransactionState();
+}
+
+class _NewtransactionState extends State<Newtransaction> {
   final titleController = TextEditingController();
+
   final amountController = TextEditingController();
+
+  void submitData() {
+    final enteredTitle = titleController.text;
+    final enteredAmount = double.parse(amountController.text);
+
+    widget.addingtx(
+      enteredTitle,
+      enteredAmount,
+    );
+
+    amountController.clear();
+    titleController.clear();
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +52,7 @@ class Newtransaction extends StatelessWidget {
                   contentPadding: EdgeInsets.fromLTRB(0, 10, 10, 10),
                 ),
                 controller: titleController,
+                onSubmitted: (ctx) => submitData,
               ),
             ),
             Padding(
@@ -41,18 +63,16 @@ class Newtransaction extends StatelessWidget {
                   contentPadding: EdgeInsets.fromLTRB(0, 10, 10, 10),
                 ),
                 controller: amountController,
+                onSubmitted: (ctx) => submitData,
+                keyboardType: TextInputType.number,
               ),
             ),
             TextButton(
-              onPressed: () => {
-                addingtx(
-                  titleController.text,
-                  double.parse(amountController.text),
-                ),
-              },
+              onPressed: submitData,
               child: const Text(
                 "enter transaction",
                 style: TextStyle(
+                    decorationThickness: BorderSide.strokeAlignOutside,
                     fontSize: 24,
                     fontStyle: FontStyle.italic,
                     color: Colors.greenAccent,
