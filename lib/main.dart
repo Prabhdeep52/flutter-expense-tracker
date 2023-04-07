@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 import 'widgets/newTransactions.dart';
 import 'widgets/transactionLists.dart';
+import 'widgets/chart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'expense tracker',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.green,
         fontFamily: 'OpenSans',
       ),
       home: const MyHomePage(
@@ -65,17 +66,30 @@ class _MyHomePageState extends State<MyHomePage> {
     // ),
   ];
 
-  void _addingNewTransaction(String txtitle, double txamount) {
+  List<Transaction> get _recentTransaction {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
+    }).toList();
+  }
+
+  void _addingNewTransaction(
+      String txtitle, double txamount, DateTime choosenDate) {
     final newTx = Transaction(
         id: DateTime.now().toString(),
         amount: txamount,
-        date: DateTime.now(),
+        date: choosenDate,
         nameOfItem: txtitle);
 
     //now we will add newtx to the above usertransaction list and rebuild the widget using setstate
 
     setState(() {
       _userTransactions.add(newTx);
+    });
+  }
+
+  void deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((tx) => tx.id == id);
     });
   }
 
@@ -95,15 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 5, 24),
-                margin: const EdgeInsets.all(7),
-                child: const Icon(
-                  Icons.airplay_outlined,
-                  size: 45,
-                ),
-              ),
-             
+              Chart(recentTransactions: _recentTransaction),
               Container(
                 margin: const EdgeInsets.all(3),
                 padding: const EdgeInsets.all(5),
@@ -115,7 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     //   _addingNewTransaction,
                     //   addingtx: _addingNewTransaction,
                     // ),
-                    TransactionList(_userTransactions),
+                    TransactionList(
+                      _userTransactions,
+                      deleteTransaction,
+                      deleteTx: deleteTransaction,
+                    ),
                   ],
                 ),
               ),

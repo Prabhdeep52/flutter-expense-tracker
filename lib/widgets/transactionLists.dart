@@ -4,12 +4,15 @@ import 'package:intl/intl.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
-  const TransactionList(this.transactions, {super.key});
+  final Function deleteTx;
+  const TransactionList(
+      this.transactions, void Function(String id) deleteTransaction,
+      {super.key, required this.deleteTx});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 420,
+      height: 400,
       child: transactions.isEmpty
           ? Column(
               children: [
@@ -19,7 +22,7 @@ class TransactionList extends StatelessWidget {
                 ),
                 Container(
                     margin: const EdgeInsets.fromLTRB(0, 70, 0, 0),
-                    height: 250,
+                    height: 200,
                     child: Image.asset(
                       'assets/images/waiting.png',
                       fit: BoxFit.cover,
@@ -30,21 +33,13 @@ class TransactionList extends StatelessWidget {
                     "click the button to add new transaction",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                )
+                ),
               ],
             )
           : ListView.builder(
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                      child: const Text(
-                        "Transactions",
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold),
-                      ),
-                    ),
                     Card(
                       shadowColor: Color.fromARGB(255, 0, 0, 0),
                       shape: const RoundedRectangleBorder(
@@ -61,35 +56,43 @@ class TransactionList extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 )),
                           ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.fromLTRB(10, 3, 10, 2),
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 3, 10, 1),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                  color: Colors.black,
-                                  width: 2,
-                                  style: BorderStyle.none,
-                                )),
-                                child: Text(
-                                    'Rs ${transactions[index].amount.toStringAsFixed(2)}',
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Column(
+                              children: [
+                                Container(
+                                  // margin:
+                                  //     const EdgeInsets.fromLTRB(10, 3, 10, 2),
+                                  // padding:
+                                  //     const EdgeInsets.fromLTRB(10, 3, 10, 1),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                    color: Colors.black,
+                                    width: 2,
+                                    style: BorderStyle.none,
+                                  )),
+                                  child: Text(
+                                      'Rs ${transactions[index].amount.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                ),
+                                Text(
+                                    DateFormat.MMMEd()
+                                        .format(transactions[index].date),
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.bold,
-                                    )),
-                              ),
-                              Text(
-                                  DateFormat.MMMEd()
-                                      .format(transactions[index].date),
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueGrey,
-                                  ))
-                            ],
+                                      color: Colors.blueGrey,
+                                    ))
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => deleteTx(transactions[index].id),
+                            icon: const Icon(Icons.delete_outlined),
+                            color: Colors.redAccent,
                           ),
                         ],
                       ),
